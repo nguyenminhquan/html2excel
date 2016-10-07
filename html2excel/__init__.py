@@ -1,1 +1,1 @@
-from .table import *
+from .extractor import *
