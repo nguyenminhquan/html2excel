@@ -77,20 +77,29 @@ class Extractor:
             else:
                 return 'type_inconsistent'
 
-    def merge(self):
+    def merge(self, trim=0):
         if self.table_type == 'horizontal_header':
-            #Remove heads of all tables after the first table
-            for i in range(1, len(self.processed_data)):
-                del self.processed_data[i][0]
+            #Remove heads of all tables after the first table and trim
+            for i in range(0, len(self.processed_data)):
+                if i > 0:
+                    del self.processed_data[i][0]
+                for _ in range(trim):
+                    del self.processed_data[i][-1]
             #Combine all tables into one
             self.contents = list(itertools.chain.from_iterable(self.processed_data))
 
 
         elif self.table_type == 'vertical_header':
+            #Invert each individual table
             for i in range(len(self.processed_data)):
                 self.processed_data[i] = self.invert(self.processed_data[i])
-            for i in range(1, len(self.processed_data)):
-                del self.processed_data[i][0]
+            #Remove heads of all tables after the first table and trim
+            for i in range(0, len(self.processed_data)):
+                if i > 0:
+                    del self.processed_data[i][0]
+                for _ in range(trim):
+                    del self.processed_data[i][-1]
+            #Combine all tables into one then invert back
             self.contents = self.invert(list(itertools.chain.from_iterable(self.processed_data)))
 
         elif self.table_type == 'type_inconsistent':
